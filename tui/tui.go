@@ -2,6 +2,7 @@ package tui
 
 import (
 	"log"
+	"fmt"
 	"strings"
 	"strconv"
 	st "html_targeter/shared"
@@ -25,23 +26,27 @@ func Tui_html(tags map[string][]st.Tag_info, attrs map[string][]st.Attr_info) {
 		screen.Clear()
 		width, height := screen.Size()
 
+		desc := fmt.Sprintf("%-5s %-10s %-10s", "LINE", "ATTR", "VAL")
+		printLine(screen, 0, desc)
+		printLine(screen, 1, strings.Repeat("-", width))
 		// Display current input
 		printLine(screen, height-2, strings.Repeat("=", width))
 		printLine(screen, height-1, "Type: "+input)
 
 		// Check for match
 		if val, ok := tags[input]; ok {
-			y := 0
+			y := 2
 			for _, t := range val {
 				var line string
 				for i, a := range t.Attr {
-					line = strconv.Itoa(int(t.Line)) + ": " + a + ":: " + t.Value[i]
+					t_line := strconv.Itoa(int(t.Line))
+					line =  fmt.Sprintf("%-5s %-10s %-10s", t_line, a, t.Value[i])
 					printLine(screen, y, line)
 					y++
 				}
 			}
 		} else {
-			printLine(screen, 1, "No match")
+			printLine(screen, 2, "No match")
 		}
 
 		screen.Show()
