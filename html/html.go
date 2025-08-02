@@ -50,7 +50,7 @@ func Html_parse(url string) (map[string][]st.Tag_info, map[string][]st.Attr_info
 
 func parse_html(html_src io.Reader, tags map[string][]st.Tag_info, attrs map[string][]st.Attr_info) {
 	tokenizer := html.NewTokenizer(html_src)
-	var line uint = 1
+	var line uint = 0
 
 	html_loop:
 	for {

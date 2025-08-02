@@ -21,12 +21,15 @@ func Tui_html(tags map[string][]st.Tag_info, attrs map[string][]st.Attr_info) {
 	defer screen.Fini()
 
 	input := ""
+	scroll := 0
 
 	for {
+		var matches bool
+		var lines []string
 		screen.Clear()
 		width, height := screen.Size()
 
-		desc := fmt.Sprintf("%-5s %-10s %-10s", "LINE", "ATTR", "VAL")
+		desc := fmt.Sprintf("%-5s %-15s %-15s", "LINE", "ATTR", "VAL")
 		printLine(screen, 0, desc)
 		printLine(screen, 1, strings.Repeat("-", width))
 		// Display current input
@@ -35,18 +38,24 @@ func Tui_html(tags map[string][]st.Tag_info, attrs map[string][]st.Attr_info) {
 
 		// Check for match
 		if val, ok := tags[input]; ok {
-			y := 2
+			matches = ok
 			for _, t := range val {
-				var line string
 				for i, a := range t.Attr {
 					t_line := strconv.Itoa(int(t.Line))
-					line =  fmt.Sprintf("%-5s %-10s %-10s", t_line, a, t.Value[i])
-					printLine(screen, y, line)
-					y++
+					lines = append(lines, fmt.Sprintf("%-5s %-15s %-15s", t_line, a, t.Value[i]))
 				}
 			}
 		} else {
 			printLine(screen, 2, "No match")
+		}
+
+		if matches {
+			for i := range height-4 {
+				if scroll+i >= len(lines) {
+					break
+				}
+				printLine(screen, i+2, lines[scroll+i])
+			}
 		}
 
 		screen.Show()
@@ -60,6 +69,14 @@ func Tui_html(tags map[string][]st.Tag_info, attrs map[string][]st.Attr_info) {
 			case tcell.KeyBackspace, tcell.KeyBackspace2:
 				if len(input) > 0 {
 					input = input[:len(input)-1]
+				}
+			case tcell.KeyUp:
+				if scroll > 0 {
+					scroll--
+				}
+			case tcell.KeyDown:
+				if scroll < len(lines)-height {
+					scroll++
 				}
 			case tcell.KeyRune:
 				input += string(ev.Rune())
