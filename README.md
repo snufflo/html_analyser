@@ -1,4 +1,4 @@
-HTML-Parser
+html_analyser
 ===========
 This project is to be developed as a tool to aid enumerating and analyzing websites specifically to scout out potential vulnerabilities.
 

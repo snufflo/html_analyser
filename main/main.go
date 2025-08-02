@@ -14,7 +14,8 @@ func main() {
 	reader := bufio.NewReader(os.Stdin)
 	url, _ := reader.ReadString('\n')
 	url = strings.TrimSpace(url)
+	fmt.Println("requesting html source code...")
 
-	tags, attrs := html.Html_parse(url)
-	tui.Tui_html(tags, attrs)
+	tags, attrs := html.HtmlParse(url)
+	tui.TuiHtml(tags, attrs, url)
 }

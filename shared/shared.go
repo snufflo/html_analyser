@@ -1,12 +1,12 @@
 package shared
 
 // for html source
-type Attr_info struct {
+type AttrInfo struct {
 	Tag string
 	Value string
 	Line uint
 }
-type Tag_info struct {
+type TagInfo struct {
 	Attr []string
 	Value []string
 	Line uint

@@ -10,7 +10,7 @@ import (
 	"github.com/gdamore/tcell/v2"
 )
 
-func Tui_html(tags map[string][]st.Tag_info, attrs map[string][]st.Attr_info) {
+func TuiHtml(tags map[string][]st.TagInfo, attrs map[string][]st.AttrInfo, url string) {
 	screen, err := tcell.NewScreen()
 	if err != nil {
 		log.Fatalf("Error creating screen: %v", err)
@@ -29,12 +29,16 @@ func Tui_html(tags map[string][]st.Tag_info, attrs map[string][]st.Attr_info) {
 		screen.Clear()
 		width, height := screen.Size()
 
+		offset := 0
+		printLineHighlight(screen, 0, "Showing results for: " + url, offset, tcell.ColorBlack, tcell.ColorPink)
 		desc := fmt.Sprintf("%-5s %-15s %-15s", "LINE", "ATTR", "VAL")
-		printLine(screen, 0, desc)
-		printLine(screen, 1, strings.Repeat("-", width))
+		printLine(screen, 1, desc)
+		printLine(screen, 2, strings.Repeat("-", width))
 		// Display current input
 		printLine(screen, height-2, strings.Repeat("=", width))
-		printLine(screen, height-1, "Type: "+input)
+		tagText := "Tag: "
+		printLine(screen, height-1, tagText)
+		printLineHighlight(screen, height-1, input, len(tagText), tcell.ColorBlack, tcell.ColorWhite)
 
 		// Check for match
 		if val, ok := tags[input]; ok {
@@ -46,15 +50,15 @@ func Tui_html(tags map[string][]st.Tag_info, attrs map[string][]st.Attr_info) {
 				}
 			}
 		} else {
-			printLine(screen, 2, "No match")
+			printLine(screen, 3, "No match")
 		}
 
 		if matches {
-			for i := range height-4 {
+			for i := range height-5 {
 				if scroll+i >= len(lines) {
 					break
 				}
-				printLine(screen, i+2, lines[scroll+i])
+				printLine(screen, i+3, lines[scroll+i])
 			}
 		}
 
@@ -90,6 +94,7 @@ func printLine(s tcell.Screen, y int, text string) {
 	runes := []rune(text)
 
 	for i := 0; i < len(runes); i += width {
+		// wrap text
 		end := i + width
 		if end > len(runes) {
 			end = len(runes)
@@ -104,3 +109,15 @@ func printLine(s tcell.Screen, y int, text string) {
 	}
 }
 
+func printLineHighlight(s tcell.Screen, y int, text string, offset int, fg, bg tcell.Color) {
+	width, _ := s.Size()
+	style := tcell.StyleDefault.Foreground(fg).Background(bg)
+
+	for x := offset; x < width; x++ {
+		var r rune = ' '
+		if x-offset < len(text) {
+			r = rune(text[x-offset])
+		}
+		s.SetContent(x, y, r, nil, style)
+	}
+}

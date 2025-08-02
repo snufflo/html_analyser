@@ -11,9 +11,9 @@ import (
 )
 
 
-func Html_parse(url string) (map[string][]st.Tag_info, map[string][]st.Attr_info) {
-	var tags = make(map[string][]st.Tag_info)
-	var attrs = make(map[string][]st.Attr_info)
+func HtmlParse(url string) (map[string][]st.TagInfo, map[string][]st.AttrInfo) {
+	var tags = make(map[string][]st.TagInfo)
+	var attrs = make(map[string][]st.AttrInfo)
 
 	resp, err := http.Get(url)
 	log_err(err, "http get fail")
@@ -22,7 +22,7 @@ func Html_parse(url string) (map[string][]st.Tag_info, map[string][]st.Attr_info
 //	bytes, err := io.ReadAll(resp.Body)
 //	log_err(err)
 
-	parse_html(resp.Body, tags, attrs)
+	parseHtml(resp.Body, tags, attrs)
 
 	fmt.Println("")
 	fmt.Println("TAGS:")
@@ -48,7 +48,7 @@ func Html_parse(url string) (map[string][]st.Tag_info, map[string][]st.Attr_info
 	return tags, attrs
 }
 
-func parse_html(html_src io.Reader, tags map[string][]st.Tag_info, attrs map[string][]st.Attr_info) {
+func parseHtml(html_src io.Reader, tags map[string][]st.TagInfo, attrs map[string][]st.AttrInfo) {
 	tokenizer := html.NewTokenizer(html_src)
 	var line uint = 0
 
@@ -77,7 +77,7 @@ func parse_html(html_src io.Reader, tags map[string][]st.Tag_info, attrs map[str
 				ta = append(ta, string(ta_bytes))
 				val = append(val, string(val_bytes))
 
-				attr := st.Attr_info{
+				attr := st.AttrInfo{
 					Tag: tn,
 					Value: val[len(val)-1],
 					Line: line,
@@ -96,7 +96,7 @@ func parse_html(html_src io.Reader, tags map[string][]st.Tag_info, attrs map[str
 			// plain text detected
 		case html.StartTagToken:
 
-			tag := st.Tag_info{
+			tag := st.TagInfo{
 				Attr: ta,
 				Value: val,
 				Line: line,
